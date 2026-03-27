@@ -12,6 +12,17 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
     return (select(settings)..where((s) => s.id.equals(1))).getSingle();
   }
 
+  Future<void> updateSwingMode(String mode) async {
+    // When switching modes, also update the offset to the mode's default
+    final defaultOffset = mode == 'freehand' ? 0.7 : 0.5;
+    await (update(settings)..where((s) => s.id.equals(1))).write(
+      SettingsCompanion(
+        swingMode: Value(mode),
+        clubLengthOffsetM: Value(defaultOffset),
+      ),
+    );
+  }
+
   Future<void> updateClubOffset(double offsetM) async {
     await (update(settings)..where((s) => s.id.equals(1)))
         .write(SettingsCompanion(clubLengthOffsetM: Value(offsetM)));

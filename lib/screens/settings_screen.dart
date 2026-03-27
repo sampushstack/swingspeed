@@ -38,8 +38,119 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       textAlign: TextAlign.center),
                   const SizedBox(height: 32),
 
-                  // Club length offset
-                  Text('CLUB LENGTH OFFSET',
+                  // Swing mode toggle
+                  Text('SWING MODE',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: AugustaTheme.gold,
+                        letterSpacing: 2,
+                      )),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () async {
+                            await ref.read(settingsDaoProvider).updateSwingMode('club');
+                            ref.invalidate(settingsProvider);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            decoration: BoxDecoration(
+                              color: settings.swingMode == 'club'
+                                  ? AugustaTheme.gold
+                                  : AugustaTheme.surface,
+                              border: Border.all(
+                                color: AugustaTheme.gold,
+                                width: settings.swingMode == 'club' ? 2 : 1,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Icon(Icons.sports_golf,
+                                    color: settings.swingMode == 'club'
+                                        ? AugustaTheme.background
+                                        : AugustaTheme.textSecondary,
+                                    size: 24),
+                                const SizedBox(height: 6),
+                                Text('CLUB MOUNT',
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1.5,
+                                      color: settings.swingMode == 'club'
+                                          ? AugustaTheme.background
+                                          : AugustaTheme.textSecondary,
+                                    )),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () async {
+                            await ref.read(settingsDaoProvider).updateSwingMode('freehand');
+                            ref.invalidate(settingsProvider);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            decoration: BoxDecoration(
+                              color: settings.swingMode == 'freehand'
+                                  ? AugustaTheme.gold
+                                  : AugustaTheme.surface,
+                              border: Border.all(
+                                color: AugustaTheme.gold,
+                                width: settings.swingMode == 'freehand' ? 2 : 1,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Icon(Icons.back_hand_outlined,
+                                    color: settings.swingMode == 'freehand'
+                                        ? AugustaTheme.background
+                                        : AugustaTheme.textSecondary,
+                                    size: 24),
+                                const SizedBox(height: 6),
+                                Text('FREEHAND',
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1.5,
+                                      color: settings.swingMode == 'freehand'
+                                          ? AugustaTheme.background
+                                          : AugustaTheme.textSecondary,
+                                    )),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    settings.swingMode == 'club'
+                        ? 'Phone attached to club shaft'
+                        : 'Hold phone in hand — no club needed',
+                    style: TextStyle(
+                        color: AugustaTheme.textSecondary,
+                        fontFamily: 'Inter',
+                        fontSize: 12),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Pivot distance
+                  Text(
+                      settings.swingMode == 'club'
+                          ? 'CLUB LENGTH OFFSET'
+                          : 'ARM LENGTH',
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 10,
@@ -48,7 +159,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         letterSpacing: 2,
                       )),
                   const SizedBox(height: 4),
-                  Text('Distance from phone mount to club head',
+                  Text(
+                      settings.swingMode == 'club'
+                          ? 'Distance from phone mount to club head'
+                          : 'Distance from shoulder to phone in hand',
                       style: TextStyle(
                           color: AugustaTheme.textSecondary,
                           fontFamily: 'Inter',

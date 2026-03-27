@@ -895,6 +895,18 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     requiredDuringInsert: false,
     defaultValue: const Constant(1),
   );
+  static const VerificationMeta _swingModeMeta = const VerificationMeta(
+    'swingMode',
+  );
+  @override
+  late final GeneratedColumn<String> swingMode = GeneratedColumn<String>(
+    'swing_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('club'),
+  );
   static const VerificationMeta _clubLengthOffsetMMeta = const VerificationMeta(
     'clubLengthOffsetM',
   );
@@ -960,6 +972,7 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
   @override
   List<GeneratedColumn> get $columns => [
     id,
+    swingMode,
     clubLengthOffsetM,
     allTimePeakMph,
     swingStartThreshold,
@@ -980,6 +993,12 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('swing_mode')) {
+      context.handle(
+        _swingModeMeta,
+        swingMode.isAcceptableOrUnknown(data['swing_mode']!, _swingModeMeta),
+      );
     }
     if (data.containsKey('club_length_offset_m')) {
       context.handle(
@@ -1036,6 +1055,10 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
+      swingMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}swing_mode'],
+      )!,
       clubLengthOffsetM: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}club_length_offset_m'],
@@ -1067,6 +1090,7 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
 
 class Setting extends DataClass implements Insertable<Setting> {
   final int id;
+  final String swingMode;
   final double clubLengthOffsetM;
   final double allTimePeakMph;
   final double swingStartThreshold;
@@ -1074,6 +1098,7 @@ class Setting extends DataClass implements Insertable<Setting> {
   final int cooldownMs;
   const Setting({
     required this.id,
+    required this.swingMode,
     required this.clubLengthOffsetM,
     required this.allTimePeakMph,
     required this.swingStartThreshold,
@@ -1084,6 +1109,7 @@ class Setting extends DataClass implements Insertable<Setting> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
+    map['swing_mode'] = Variable<String>(swingMode);
     map['club_length_offset_m'] = Variable<double>(clubLengthOffsetM);
     map['all_time_peak_mph'] = Variable<double>(allTimePeakMph);
     map['swing_start_threshold'] = Variable<double>(swingStartThreshold);
@@ -1095,6 +1121,7 @@ class Setting extends DataClass implements Insertable<Setting> {
   SettingsCompanion toCompanion(bool nullToAbsent) {
     return SettingsCompanion(
       id: Value(id),
+      swingMode: Value(swingMode),
       clubLengthOffsetM: Value(clubLengthOffsetM),
       allTimePeakMph: Value(allTimePeakMph),
       swingStartThreshold: Value(swingStartThreshold),
@@ -1110,6 +1137,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Setting(
       id: serializer.fromJson<int>(json['id']),
+      swingMode: serializer.fromJson<String>(json['swingMode']),
       clubLengthOffsetM: serializer.fromJson<double>(json['clubLengthOffsetM']),
       allTimePeakMph: serializer.fromJson<double>(json['allTimePeakMph']),
       swingStartThreshold: serializer.fromJson<double>(
@@ -1124,6 +1152,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'swingMode': serializer.toJson<String>(swingMode),
       'clubLengthOffsetM': serializer.toJson<double>(clubLengthOffsetM),
       'allTimePeakMph': serializer.toJson<double>(allTimePeakMph),
       'swingStartThreshold': serializer.toJson<double>(swingStartThreshold),
@@ -1134,6 +1163,7 @@ class Setting extends DataClass implements Insertable<Setting> {
 
   Setting copyWith({
     int? id,
+    String? swingMode,
     double? clubLengthOffsetM,
     double? allTimePeakMph,
     double? swingStartThreshold,
@@ -1141,6 +1171,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     int? cooldownMs,
   }) => Setting(
     id: id ?? this.id,
+    swingMode: swingMode ?? this.swingMode,
     clubLengthOffsetM: clubLengthOffsetM ?? this.clubLengthOffsetM,
     allTimePeakMph: allTimePeakMph ?? this.allTimePeakMph,
     swingStartThreshold: swingStartThreshold ?? this.swingStartThreshold,
@@ -1150,6 +1181,7 @@ class Setting extends DataClass implements Insertable<Setting> {
   Setting copyWithCompanion(SettingsCompanion data) {
     return Setting(
       id: data.id.present ? data.id.value : this.id,
+      swingMode: data.swingMode.present ? data.swingMode.value : this.swingMode,
       clubLengthOffsetM: data.clubLengthOffsetM.present
           ? data.clubLengthOffsetM.value
           : this.clubLengthOffsetM,
@@ -1172,6 +1204,7 @@ class Setting extends DataClass implements Insertable<Setting> {
   String toString() {
     return (StringBuffer('Setting(')
           ..write('id: $id, ')
+          ..write('swingMode: $swingMode, ')
           ..write('clubLengthOffsetM: $clubLengthOffsetM, ')
           ..write('allTimePeakMph: $allTimePeakMph, ')
           ..write('swingStartThreshold: $swingStartThreshold, ')
@@ -1184,6 +1217,7 @@ class Setting extends DataClass implements Insertable<Setting> {
   @override
   int get hashCode => Object.hash(
     id,
+    swingMode,
     clubLengthOffsetM,
     allTimePeakMph,
     swingStartThreshold,
@@ -1195,6 +1229,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       identical(this, other) ||
       (other is Setting &&
           other.id == this.id &&
+          other.swingMode == this.swingMode &&
           other.clubLengthOffsetM == this.clubLengthOffsetM &&
           other.allTimePeakMph == this.allTimePeakMph &&
           other.swingStartThreshold == this.swingStartThreshold &&
@@ -1204,6 +1239,7 @@ class Setting extends DataClass implements Insertable<Setting> {
 
 class SettingsCompanion extends UpdateCompanion<Setting> {
   final Value<int> id;
+  final Value<String> swingMode;
   final Value<double> clubLengthOffsetM;
   final Value<double> allTimePeakMph;
   final Value<double> swingStartThreshold;
@@ -1211,6 +1247,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   final Value<int> cooldownMs;
   const SettingsCompanion({
     this.id = const Value.absent(),
+    this.swingMode = const Value.absent(),
     this.clubLengthOffsetM = const Value.absent(),
     this.allTimePeakMph = const Value.absent(),
     this.swingStartThreshold = const Value.absent(),
@@ -1219,6 +1256,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   });
   SettingsCompanion.insert({
     this.id = const Value.absent(),
+    this.swingMode = const Value.absent(),
     this.clubLengthOffsetM = const Value.absent(),
     this.allTimePeakMph = const Value.absent(),
     this.swingStartThreshold = const Value.absent(),
@@ -1227,6 +1265,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   });
   static Insertable<Setting> custom({
     Expression<int>? id,
+    Expression<String>? swingMode,
     Expression<double>? clubLengthOffsetM,
     Expression<double>? allTimePeakMph,
     Expression<double>? swingStartThreshold,
@@ -1235,6 +1274,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (swingMode != null) 'swing_mode': swingMode,
       if (clubLengthOffsetM != null) 'club_length_offset_m': clubLengthOffsetM,
       if (allTimePeakMph != null) 'all_time_peak_mph': allTimePeakMph,
       if (swingStartThreshold != null)
@@ -1246,6 +1286,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
 
   SettingsCompanion copyWith({
     Value<int>? id,
+    Value<String>? swingMode,
     Value<double>? clubLengthOffsetM,
     Value<double>? allTimePeakMph,
     Value<double>? swingStartThreshold,
@@ -1254,6 +1295,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   }) {
     return SettingsCompanion(
       id: id ?? this.id,
+      swingMode: swingMode ?? this.swingMode,
       clubLengthOffsetM: clubLengthOffsetM ?? this.clubLengthOffsetM,
       allTimePeakMph: allTimePeakMph ?? this.allTimePeakMph,
       swingStartThreshold: swingStartThreshold ?? this.swingStartThreshold,
@@ -1267,6 +1309,9 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<int>(id.value);
+    }
+    if (swingMode.present) {
+      map['swing_mode'] = Variable<String>(swingMode.value);
     }
     if (clubLengthOffsetM.present) {
       map['club_length_offset_m'] = Variable<double>(clubLengthOffsetM.value);
@@ -1292,6 +1337,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   String toString() {
     return (StringBuffer('SettingsCompanion(')
           ..write('id: $id, ')
+          ..write('swingMode: $swingMode, ')
           ..write('clubLengthOffsetM: $clubLengthOffsetM, ')
           ..write('allTimePeakMph: $allTimePeakMph, ')
           ..write('swingStartThreshold: $swingStartThreshold, ')
@@ -2000,6 +2046,7 @@ typedef $$SwingsTableProcessedTableManager =
 typedef $$SettingsTableCreateCompanionBuilder =
     SettingsCompanion Function({
       Value<int> id,
+      Value<String> swingMode,
       Value<double> clubLengthOffsetM,
       Value<double> allTimePeakMph,
       Value<double> swingStartThreshold,
@@ -2009,6 +2056,7 @@ typedef $$SettingsTableCreateCompanionBuilder =
 typedef $$SettingsTableUpdateCompanionBuilder =
     SettingsCompanion Function({
       Value<int> id,
+      Value<String> swingMode,
       Value<double> clubLengthOffsetM,
       Value<double> allTimePeakMph,
       Value<double> swingStartThreshold,
@@ -2027,6 +2075,11 @@ class $$SettingsTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get swingMode => $composableBuilder(
+    column: $table.swingMode,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2070,6 +2123,11 @@ class $$SettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get swingMode => $composableBuilder(
+    column: $table.swingMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get clubLengthOffsetM => $composableBuilder(
     column: $table.clubLengthOffsetM,
     builder: (column) => ColumnOrderings(column),
@@ -2107,6 +2165,9 @@ class $$SettingsTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get swingMode =>
+      $composableBuilder(column: $table.swingMode, builder: (column) => column);
 
   GeneratedColumn<double> get clubLengthOffsetM => $composableBuilder(
     column: $table.clubLengthOffsetM,
@@ -2163,6 +2224,7 @@ class $$SettingsTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<String> swingMode = const Value.absent(),
                 Value<double> clubLengthOffsetM = const Value.absent(),
                 Value<double> allTimePeakMph = const Value.absent(),
                 Value<double> swingStartThreshold = const Value.absent(),
@@ -2170,6 +2232,7 @@ class $$SettingsTableTableManager
                 Value<int> cooldownMs = const Value.absent(),
               }) => SettingsCompanion(
                 id: id,
+                swingMode: swingMode,
                 clubLengthOffsetM: clubLengthOffsetM,
                 allTimePeakMph: allTimePeakMph,
                 swingStartThreshold: swingStartThreshold,
@@ -2179,6 +2242,7 @@ class $$SettingsTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<String> swingMode = const Value.absent(),
                 Value<double> clubLengthOffsetM = const Value.absent(),
                 Value<double> allTimePeakMph = const Value.absent(),
                 Value<double> swingStartThreshold = const Value.absent(),
@@ -2186,6 +2250,7 @@ class $$SettingsTableTableManager
                 Value<int> cooldownMs = const Value.absent(),
               }) => SettingsCompanion.insert(
                 id: id,
+                swingMode: swingMode,
                 clubLengthOffsetM: clubLengthOffsetM,
                 allTimePeakMph: allTimePeakMph,
                 swingStartThreshold: swingStartThreshold,

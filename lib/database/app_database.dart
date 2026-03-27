@@ -24,6 +24,8 @@ class Swings extends Table {
 
 class Settings extends Table {
   IntColumn get id => integer().withDefault(const Constant(1))();
+  // 'club' = phone mounted on club shaft, 'freehand' = phone held in hand
+  TextColumn get swingMode => text().withDefault(const Constant('club'))();
   RealColumn get clubLengthOffsetM => real().withDefault(const Constant(0.5))();
   RealColumn get allTimePeakMph => real().withDefault(const Constant(0.0))();
   RealColumn get swingStartThreshold => real().withDefault(const Constant(3.0))();
@@ -40,13 +42,18 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? driftDatabase(name: 'swingspeed'));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) async {
           await m.createAll();
           await into(settings).insert(SettingsCompanion.insert());
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          if (from < 2) {
+            await m.addColumn(settings, settings.swingMode);
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
