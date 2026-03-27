@@ -1,0 +1,223 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/database_provider.dart';
+import '../providers/settings_provider.dart';
+import '../theme/augusta_theme.dart';
+
+class SettingsScreen extends ConsumerStatefulWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  bool _showAdvanced = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final settingsAsync = ref.watch(settingsProvider);
+
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: settingsAsync.when(
+            data: (settings) => SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('SETTINGS',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AugustaTheme.gold,
+                        letterSpacing: 3,
+                      ),
+                      textAlign: TextAlign.center),
+                  const SizedBox(height: 32),
+
+                  // Club length offset
+                  Text('CLUB LENGTH OFFSET',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: AugustaTheme.gold,
+                        letterSpacing: 2,
+                      )),
+                  const SizedBox(height: 4),
+                  Text('Distance from phone mount to club head',
+                      style: TextStyle(
+                          color: AugustaTheme.textSecondary,
+                          fontFamily: 'Inter',
+                          fontSize: 12)),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Text('${settings.clubLengthOffsetM.toStringAsFixed(2)} m',
+                          style: TextStyle(
+                            color: AugustaTheme.textPrimary,
+                            fontFamily: 'Inter',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          )),
+                      const Spacer(),
+                      Text('0.1',
+                          style: TextStyle(
+                              color: AugustaTheme.textSecondary,
+                              fontSize: 11)),
+                      Expanded(
+                        flex: 3,
+                        child: Slider(
+                          value: settings.clubLengthOffsetM,
+                          min: 0.1,
+                          max: 1.2,
+                          divisions: 22,
+                          activeColor: AugustaTheme.gold,
+                          inactiveColor: AugustaTheme.surface,
+                          onChanged: (v) async {
+                            await ref
+                                .read(settingsDaoProvider)
+                                .updateClubOffset(v);
+                            ref.invalidate(settingsProvider);
+                          },
+                        ),
+                      ),
+                      Text('1.2',
+                          style: TextStyle(
+                              color: AugustaTheme.textSecondary,
+                              fontSize: 11)),
+                    ],
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Advanced
+                  GestureDetector(
+                    onTap: () =>
+                        setState(() => _showAdvanced = !_showAdvanced),
+                    child: Row(
+                      children: [
+                        Text('ADVANCED',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AugustaTheme.gold,
+                              letterSpacing: 2,
+                            )),
+                        const SizedBox(width: 8),
+                        Icon(
+                          _showAdvanced
+                              ? Icons.expand_less
+                              : Icons.expand_more,
+                          color: AugustaTheme.gold,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_showAdvanced) ...[
+                    const SizedBox(height: 16),
+                    _ThresholdSlider(
+                      label: 'Start Threshold (rad/s)',
+                      value: settings.swingStartThreshold,
+                      min: 1.0,
+                      max: 10.0,
+                      onChanged: (v) async {
+                        await ref
+                            .read(settingsDaoProvider)
+                            .updateThresholds(startThreshold: v);
+                        ref.invalidate(settingsProvider);
+                      },
+                    ),
+                    _ThresholdSlider(
+                      label: 'End Threshold (rad/s)',
+                      value: settings.swingEndThreshold,
+                      min: 0.1,
+                      max: 5.0,
+                      onChanged: (v) async {
+                        await ref
+                            .read(settingsDaoProvider)
+                            .updateThresholds(endThreshold: v);
+                        ref.invalidate(settingsProvider);
+                      },
+                    ),
+                    _ThresholdSlider(
+                      label: 'Cooldown (ms)',
+                      value: settings.cooldownMs.toDouble(),
+                      min: 500,
+                      max: 3000,
+                      onChanged: (v) async {
+                        await ref
+                            .read(settingsDaoProvider)
+                            .updateThresholds(cooldownMs: v.round());
+                        ref.invalidate(settingsProvider);
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            loading: () =>
+                const Center(child: CircularProgressIndicator()),
+            error: (_, __) => const SizedBox(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ThresholdSlider extends StatelessWidget {
+  final String label;
+  final double value;
+  final double min;
+  final double max;
+  final ValueChanged<double> onChanged;
+
+  const _ThresholdSlider({
+    required this.label,
+    required this.value,
+    required this.min,
+    required this.max,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(label,
+                  style: TextStyle(
+                      color: AugustaTheme.textSecondary,
+                      fontFamily: 'Inter',
+                      fontSize: 12)),
+              Text(value.toStringAsFixed(1),
+                  style: TextStyle(
+                      color: AugustaTheme.textPrimary,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.bold)),
+            ],
+          ),
+          Slider(
+            value: value.clamp(min, max),
+            min: min,
+            max: max,
+            activeColor: AugustaTheme.gold,
+            inactiveColor: AugustaTheme.surface,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+}
