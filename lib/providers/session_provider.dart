@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../database/app_database.dart';
+import '../models/club_types.dart';
 import '../models/swing_event.dart';
 import '../sensors/swing_detector.dart';
 import 'database_provider.dart';
@@ -63,12 +64,24 @@ class ActiveSessionNotifier extends StateNotifier<ActiveSessionState?> {
 
   Future<void> startSession() async {
     final settings = await ref.read(settingsDaoProvider).getSettings();
+
+    // Compute effective pivot distance based on mode
+    double effectiveOffset;
+    if (settings.swingMode == 'freehand') {
+      final armLength = settings.clubLengthOffsetM; // arm length in freehand mode
+      final club = getClubTypeById(settings.selectedClubType);
+      final shaftLength = club?.shaftLengthM ?? 0.0;
+      effectiveOffset = armLength + shaftLength;
+    } else {
+      effectiveOffset = settings.clubLengthOffsetM;
+    }
+
     final sessionId = await ref.read(sessionDaoProvider).createSession(
-      settings.clubLengthOffsetM,
+      effectiveOffset,
     );
 
     _detector = SwingDetector(
-      clubLengthOffsetM: settings.clubLengthOffsetM,
+      clubLengthOffsetM: effectiveOffset,
       startThreshold: settings.swingStartThreshold,
       endThreshold: settings.swingEndThreshold,
       cooldownMs: settings.cooldownMs,

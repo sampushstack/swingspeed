@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/club_types.dart';
 import '../providers/database_provider.dart';
 import '../providers/settings_provider.dart';
 import '../theme/augusta_theme.dart';
@@ -205,6 +206,93 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               fontSize: 11)),
                     ],
                   ),
+
+                  // Club type selector (freehand mode only)
+                  if (settings.swingMode == 'freehand') ...[
+                    const SizedBox(height: 24),
+                    Text('ESTIMATE FOR CLUB',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AugustaTheme.gold,
+                          letterSpacing: 2,
+                        )),
+                    const SizedBox(height: 4),
+                    Text('Select a club to estimate club head speed from your hand speed',
+                        style: TextStyle(
+                            color: AugustaTheme.textSecondary,
+                            fontFamily: 'Inter',
+                            fontSize: 12)),
+                    const SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AugustaTheme.surface,
+                        border: Border.all(color: AugustaTheme.gold.withValues(alpha: 0.3)),
+                      ),
+                      child: Column(
+                        children: clubTypes.map((club) {
+                          final isSelected = settings.selectedClubType == club.id;
+                          return GestureDetector(
+                            onTap: () async {
+                              await ref.read(settingsDaoProvider).updateSelectedClubType(club.id);
+                              ref.invalidate(settingsProvider);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              decoration: BoxDecoration(
+                                color: isSelected ? AugustaTheme.gold.withValues(alpha: 0.15) : null,
+                                border: Border(
+                                  bottom: BorderSide(color: AugustaTheme.background.withValues(alpha: 0.3), width: 1),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      if (isSelected)
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 8),
+                                          child: Icon(Icons.check, color: AugustaTheme.gold, size: 16),
+                                        ),
+                                      Text(club.name,
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontSize: 14,
+                                            color: isSelected ? AugustaTheme.gold : AugustaTheme.textPrimary,
+                                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                          )),
+                                    ],
+                                  ),
+                                  Text('${(club.shaftLengthM * 39.3701).toStringAsFixed(1)}"',
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontSize: 12,
+                                        color: AugustaTheme.textSecondary,
+                                      )),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Builder(builder: (_) {
+                      final club = getClubTypeById(settings.selectedClubType);
+                      final effectiveR = settings.clubLengthOffsetM + (club?.shaftLengthM ?? 0);
+                      return Text(
+                        'Effective pivot: ${settings.clubLengthOffsetM.toStringAsFixed(2)}m arm + ${club?.shaftLengthM.toStringAsFixed(2) ?? '0'}m shaft = ${effectiveR.toStringAsFixed(2)}m',
+                        style: TextStyle(
+                          color: AugustaTheme.textSecondary,
+                          fontFamily: 'Inter',
+                          fontSize: 11,
+                        ),
+                        textAlign: TextAlign.center,
+                      );
+                    }),
+                  ],
 
                   const SizedBox(height: 32),
 

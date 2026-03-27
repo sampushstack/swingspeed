@@ -23,6 +23,11 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  Future<void> updateSelectedClubType(String clubTypeId) async {
+    await (update(settings)..where((s) => s.id.equals(1)))
+        .write(SettingsCompanion(selectedClubType: Value(clubTypeId)));
+  }
+
   Future<void> updateClubOffset(double offsetM) async {
     await (update(settings)..where((s) => s.id.equals(1)))
         .write(SettingsCompanion(clubLengthOffsetM: Value(offsetM)));

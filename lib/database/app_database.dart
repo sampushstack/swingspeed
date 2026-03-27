@@ -26,6 +26,8 @@ class Settings extends Table {
   IntColumn get id => integer().withDefault(const Constant(1))();
   // 'club' = phone mounted on club shaft, 'freehand' = phone held in hand
   TextColumn get swingMode => text().withDefault(const Constant('club'))();
+  // In freehand mode, which club to estimate speed for (e.g. 'driver', '7_iron')
+  TextColumn get selectedClubType => text().withDefault(const Constant('driver'))();
   RealColumn get clubLengthOffsetM => real().withDefault(const Constant(0.5))();
   RealColumn get allTimePeakMph => real().withDefault(const Constant(0.0))();
   RealColumn get swingStartThreshold => real().withDefault(const Constant(3.0))();
@@ -42,7 +44,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? driftDatabase(name: 'swingspeed'));
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -53,6 +55,9 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (Migrator m, int from, int to) async {
           if (from < 2) {
             await m.addColumn(settings, settings.swingMode);
+          }
+          if (from < 3) {
+            await m.addColumn(settings, settings.selectedClubType);
           }
         },
         beforeOpen: (details) async {
