@@ -1,0 +1,42 @@
+name: swingspeed
+description: "A golf swing speed measurement app."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sensors_plus: ^6.1.1
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  drift: ^2.22.1
+  drift_flutter: ^0.2.4
+  fl_chart: ^0.70.2
+  rxdart: ^0.28.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  drift_dev: ^2.22.1
+  build_runner: ^2.4.14
+  riverpod_generator: ^2.6.3
+  mockito: ^5.4.5
+  #build_verify: ^3.1.0  # removed: conflicts with drift_dev + riverpod_generator
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: PlayfairDisplay
+      fonts:
+        - asset: assets/fonts/PlayfairDisplay-Regular.ttf
+        - asset: assets/fonts/PlayfairDisplay-Bold.ttf
+          weight: 700
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
