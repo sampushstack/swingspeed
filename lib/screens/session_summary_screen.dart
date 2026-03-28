@@ -9,6 +9,10 @@ import '../providers/settings_provider.dart';
 import '../theme/augusta_theme.dart';
 import '../widgets/speed_distribution_chart.dart';
 
+// NOTE: 3D swing path visualization is only available during the active
+// session (in-memory data). Persisting downswing gyro samples would require
+// a separate database table or a JSON blob column on the swings table.
+// Until then, the SwingPath3D widget is shown only on ActiveSessionScreen.
 class SessionSummaryScreen extends ConsumerStatefulWidget {
   final int sessionId;
   final bool isReadOnly;

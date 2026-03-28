@@ -7,6 +7,7 @@ import '../providers/session_provider.dart';
 import '../sensors/speed_calculator.dart';
 import '../theme/augusta_theme.dart';
 import '../widgets/speed_gauge.dart';
+import '../widgets/swing_path_3d.dart';
 import '../widgets/swing_result_card.dart';
 import 'session_summary_screen.dart';
 
@@ -22,6 +23,7 @@ class _ActiveSessionScreenState extends ConsumerState<ActiveSessionScreen> {
   bool _sensorAvailable = true;
   bool _lowSensorRate = false;
   bool _noSwingsHint = false;
+  bool _showPath3D = false;
   int _sampleCount = 0;
   DateTime? _rateCheckStart;
   StreamSubscription? _gyroSub;
@@ -199,6 +201,52 @@ class _ActiveSessionScreenState extends ConsumerState<ActiveSessionScreen> {
                 attackAngleDeg: session.swings.last.attackAngleDeg,
                 swingPathDeg: session.swings.last.swingPathDeg,
                 detectedLagFactor: session.swings.last.detectedLagFactor,
+              ),
+
+            // Expandable 3D swing path
+            if (session.swings.isNotEmpty &&
+                session.swings.last.downswingSamples.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () => setState(() => _showPath3D = !_showPath3D),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _showPath3D
+                                  ? Icons.expand_less
+                                  : Icons.expand_more,
+                              color: AugustaTheme.gold,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _showPath3D ? 'HIDE 3D PATH' : 'SHOW 3D PATH',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: AugustaTheme.gold,
+                                letterSpacing: 2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (_showPath3D)
+                      SwingPath3D(
+                        samples: session.swings.last.downswingSamples,
+                        clubLengthM: ref.read(activeSessionProvider.notifier).detector?.clubLengthOffsetM ?? 0.5,
+                        peakSpeedMph: session.swings.last.peakSpeedMph,
+                      ),
+                  ],
+                ),
               ),
           ],
         ),

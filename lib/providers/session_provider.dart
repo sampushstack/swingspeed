@@ -116,6 +116,7 @@ class ActiveSessionNotifier extends StateNotifier<ActiveSessionState?> {
         attackAngleDeg: event.attackAngleDeg,
         swingPathDeg: event.swingPathDeg,
         detectedLagFactor: event.detectedLagFactor,
+        downswingSamples: event.downswingSamples,
       );
 
       state = state!.copyWith(swings: [...state!.swings, adjustedEvent]);

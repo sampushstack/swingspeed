@@ -1,3 +1,14 @@
+/// A single gyroscope reading at a point in time during the swing.
+class GyroSample {
+  final double x, y, z; // rad/s
+  final double omega; // magnitude
+  const GyroSample(
+      {required this.x,
+      required this.y,
+      required this.z,
+      required this.omega});
+}
+
 class SwingEvent {
   final double peakSpeedMph;
   final int durationMs;
@@ -6,6 +17,10 @@ class SwingEvent {
   final double? swingPathDeg; // positive = in-to-out, negative = out-to-in
   final double? detectedLagFactor; // dynamic lag: 1.0 = no lag, >1.0 = wrist release detected
 
+  /// Raw gyro samples captured during the downswing for 3D path reconstruction.
+  /// In-memory only — not persisted to database.
+  final List<GyroSample> downswingSamples;
+
   const SwingEvent({
     required this.peakSpeedMph,
     required this.durationMs,
@@ -13,6 +28,7 @@ class SwingEvent {
     this.attackAngleDeg,
     this.swingPathDeg,
     this.detectedLagFactor,
+    this.downswingSamples = const [],
   });
 
   @override

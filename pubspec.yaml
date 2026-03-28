@@ -16,6 +16,7 @@ dependencies:
   drift_flutter: ^0.2.4
   fl_chart: ^0.70.2
   rxdart: ^0.28.0
+  vector_math: ^2.1.4
 
 dev_dependencies:
   flutter_test:

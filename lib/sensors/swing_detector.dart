@@ -51,6 +51,9 @@ class SwingDetector {
   /// Collects smoothed ω samples during the downswing only for lag analysis
   final List<double> _downswingSamples = [];
 
+  /// Collects raw gyro readings during the downswing for 3D path reconstruction
+  final List<GyroSample> _downswingGyroSamples = [];
+
   SwingDetector({
     required this.clubLengthOffsetM,
     this.startThreshold = 3.0,
@@ -146,6 +149,8 @@ class SwingDetector {
               _peakGyroZ = z;
               _downswingSamples.clear();
               _downswingSamples.add(omega);
+              _downswingGyroSamples.clear();
+              _downswingGyroSamples.add(GyroSample(x: x, y: y, z: z, omega: omega));
             }
           } else {
             _risingCount = 0;
@@ -162,6 +167,7 @@ class SwingDetector {
 
       case _GateState.downswing:
         _downswingSamples.add(omega);
+        _downswingGyroSamples.add(GyroSample(x: x, y: y, z: z, omega: omega));
         if (omega > _peakOmega) {
           _peakOmega = omega;
           _peakGyroX = x;
@@ -199,6 +205,7 @@ class SwingDetector {
               attackAngleDeg: attackAngleDeg,
               swingPathDeg: swingPathDeg,
               detectedLagFactor: detectedLag,
+              downswingSamples: List.unmodifiable(_downswingGyroSamples),
             ));
           }
 
