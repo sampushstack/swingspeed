@@ -65,14 +65,17 @@ class ActiveSessionNotifier extends StateNotifier<ActiveSessionState?> {
 
   Future<void> startSession() async {
     final settings = await ref.read(settingsDaoProvider).getSettings();
+    final isFreehand = settings.swingMode == 'freehand';
 
     // Compute effective pivot distance based on mode
+    // In freehand mode: arm + shaft (lag is applied per-swing dynamically)
+    // In club mode: just the club offset
     double effectiveOffset;
-    if (settings.swingMode == 'freehand') {
-      final armLength = settings.clubLengthOffsetM; // arm length in freehand mode
+    if (isFreehand) {
+      final armLength = settings.clubLengthOffsetM;
       final club = getClubTypeById(settings.selectedClubType);
       final shaftLength = club?.shaftLengthM ?? 0.0;
-      effectiveOffset = (armLength + shaftLength) * settings.lagFactor;
+      effectiveOffset = armLength + shaftLength;
     } else {
       effectiveOffset = settings.clubLengthOffsetM;
     }
@@ -86,6 +89,8 @@ class ActiveSessionNotifier extends StateNotifier<ActiveSessionState?> {
       startThreshold: settings.swingStartThreshold,
       endThreshold: settings.swingEndThreshold,
       cooldownMs: settings.cooldownMs,
+      baseLagFactor: settings.lagFactor,
+      enableDynamicLag: isFreehand,
     );
 
     state = ActiveSessionState(sessionId: sessionId);
@@ -98,15 +103,30 @@ class ActiveSessionNotifier extends StateNotifier<ActiveSessionState?> {
 
     _swingEventSub = _detector!.swingEventStream.listen((event) async {
       if (state == null) return;
-      state = state!.copyWith(swings: [...state!.swings, event]);
+
+      // In freehand mode, apply the per-swing dynamic lag factor to the speed
+      final lagAdjustedSpeed = isFreehand && event.detectedLagFactor != null
+          ? event.peakSpeedMph * event.detectedLagFactor!
+          : event.peakSpeedMph;
+
+      final adjustedEvent = SwingEvent(
+        peakSpeedMph: lagAdjustedSpeed,
+        durationMs: event.durationMs,
+        timestamp: event.timestamp,
+        attackAngleDeg: event.attackAngleDeg,
+        swingPathDeg: event.swingPathDeg,
+        detectedLagFactor: event.detectedLagFactor,
+      );
+
+      state = state!.copyWith(swings: [...state!.swings, adjustedEvent]);
 
       final companion = SwingsCompanion.insert(
         sessionId: state!.sessionId,
-        timestamp: event.timestamp.millisecondsSinceEpoch,
-        peakSpeedMph: event.peakSpeedMph,
-        durationMs: event.durationMs,
-        attackAngleDeg: Value(event.attackAngleDeg),
-        swingPathDeg: Value(event.swingPathDeg),
+        timestamp: adjustedEvent.timestamp.millisecondsSinceEpoch,
+        peakSpeedMph: lagAdjustedSpeed,
+        durationMs: adjustedEvent.durationMs,
+        attackAngleDeg: Value(adjustedEvent.attackAngleDeg),
+        swingPathDeg: Value(adjustedEvent.swingPathDeg),
       );
 
       try {

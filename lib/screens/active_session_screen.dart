@@ -198,6 +198,7 @@ class _ActiveSessionScreenState extends ConsumerState<ActiveSessionScreen> {
                 delta: session.deltaForSwing(session.swings.length - 1),
                 attackAngleDeg: session.swings.last.attackAngleDeg,
                 swingPathDeg: session.swings.last.swingPathDeg,
+                detectedLagFactor: session.swings.last.detectedLagFactor,
               ),
           ],
         ),

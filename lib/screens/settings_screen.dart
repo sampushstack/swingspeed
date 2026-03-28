@@ -293,7 +293,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       );
                     }),
                     const SizedBox(height: 24),
-                    Text('WRIST LAG FACTOR',
+                    Text('WRIST LAG FALLBACK',
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 10,
@@ -303,7 +303,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         )),
                     const SizedBox(height: 4),
                     Text(
-                        'Accounts for speed multiplication from wrist release (1.0 = no lag, 1.4 = pro-level)',
+                        'Lag is detected automatically per swing. This fallback is used when detection has too few samples.',
                         style: TextStyle(
                             color: AugustaTheme.textSecondary,
                             fontFamily: 'Inter',

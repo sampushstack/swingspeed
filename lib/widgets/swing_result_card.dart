@@ -7,6 +7,7 @@ class SwingResultCard extends StatelessWidget {
   final double? delta;
   final double? attackAngleDeg;
   final double? swingPathDeg;
+  final double? detectedLagFactor;
 
   const SwingResultCard({
     super.key,
@@ -15,6 +16,7 @@ class SwingResultCard extends StatelessWidget {
     this.delta,
     this.attackAngleDeg,
     this.swingPathDeg,
+    this.detectedLagFactor,
   });
 
   @override
@@ -51,6 +53,13 @@ class SwingResultCard extends StatelessWidget {
                   value: '${swingPathDeg! >= 0 ? '+' : ''}${swingPathDeg!.toStringAsFixed(1)}\u00B0',
                   unit: swingPathDeg! >= 0 ? 'in-to-out' : 'out-to-in',
                   valueColor: null,
+                ),
+              if (detectedLagFactor != null)
+                _StatColumn(
+                  label: 'LAG',
+                  value: '${detectedLagFactor!.toStringAsFixed(2)}x',
+                  unit: detectedLagFactor! >= 1.3 ? 'strong' : detectedLagFactor! >= 1.1 ? 'moderate' : 'low',
+                  valueColor: detectedLagFactor! >= 1.3 ? Colors.green.shade300 : null,
                 ),
             ]),
           ],
