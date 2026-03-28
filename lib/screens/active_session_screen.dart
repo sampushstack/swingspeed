@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sensors_plus/sensors_plus.dart';
@@ -24,6 +25,7 @@ class _ActiveSessionScreenState extends ConsumerState<ActiveSessionScreen> {
   bool _lowSensorRate = false;
   bool _noSwingsHint = false;
   bool _showPath3D = false;
+  int _lastSwingCount = 0;
   int _sampleCount = 0;
   DateTime? _rateCheckStart;
   StreamSubscription? _gyroSub;
@@ -109,6 +111,12 @@ class _ActiveSessionScreenState extends ConsumerState<ActiveSessionScreen> {
   Widget build(BuildContext context) {
     final session = ref.watch(activeSessionProvider);
     if (session == null) return const SizedBox();
+
+    // Vibrate on new swing detection
+    if (session.swings.length > _lastSwingCount) {
+      _lastSwingCount = session.swings.length;
+      HapticFeedback.heavyImpact();
+    }
 
     return Scaffold(
       body: SafeArea(
