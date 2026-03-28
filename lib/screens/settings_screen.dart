@@ -292,6 +292,60 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         textAlign: TextAlign.center,
                       );
                     }),
+                    const SizedBox(height: 24),
+                    Text('WRIST LAG FACTOR',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AugustaTheme.gold,
+                          letterSpacing: 2,
+                        )),
+                    const SizedBox(height: 4),
+                    Text(
+                        'Accounts for speed multiplication from wrist release (1.0 = no lag, 1.4 = pro-level)',
+                        style: TextStyle(
+                            color: AugustaTheme.textSecondary,
+                            fontFamily: 'Inter',
+                            fontSize: 12)),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Text(settings.lagFactor.toStringAsFixed(2),
+                            style: TextStyle(
+                              color: AugustaTheme.textPrimary,
+                              fontFamily: 'Inter',
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            )),
+                        const Spacer(),
+                        Text('1.0',
+                            style: TextStyle(
+                                color: AugustaTheme.textSecondary,
+                                fontSize: 11)),
+                        Expanded(
+                          flex: 3,
+                          child: Slider(
+                            value: settings.lagFactor.clamp(1.0, 1.5),
+                            min: 1.0,
+                            max: 1.5,
+                            divisions: 10,
+                            activeColor: AugustaTheme.gold,
+                            inactiveColor: AugustaTheme.surface,
+                            onChanged: (v) async {
+                              await ref
+                                  .read(settingsDaoProvider)
+                                  .updateLagFactor(v);
+                              ref.invalidate(settingsProvider);
+                            },
+                          ),
+                        ),
+                        Text('1.5',
+                            style: TextStyle(
+                                color: AugustaTheme.textSecondary,
+                                fontSize: 11)),
+                      ],
+                    ),
                   ],
 
                   const SizedBox(height: 32),

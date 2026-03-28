@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../database/app_database.dart';
 import '../models/club_types.dart';
@@ -71,7 +72,7 @@ class ActiveSessionNotifier extends StateNotifier<ActiveSessionState?> {
       final armLength = settings.clubLengthOffsetM; // arm length in freehand mode
       final club = getClubTypeById(settings.selectedClubType);
       final shaftLength = club?.shaftLengthM ?? 0.0;
-      effectiveOffset = armLength + shaftLength;
+      effectiveOffset = (armLength + shaftLength) * settings.lagFactor;
     } else {
       effectiveOffset = settings.clubLengthOffsetM;
     }
@@ -99,38 +100,25 @@ class ActiveSessionNotifier extends StateNotifier<ActiveSessionState?> {
       if (state == null) return;
       state = state!.copyWith(swings: [...state!.swings, event]);
 
+      final companion = SwingsCompanion.insert(
+        sessionId: state!.sessionId,
+        timestamp: event.timestamp.millisecondsSinceEpoch,
+        peakSpeedMph: event.peakSpeedMph,
+        durationMs: event.durationMs,
+        attackAngleDeg: Value(event.attackAngleDeg),
+        swingPathDeg: Value(event.swingPathDeg),
+      );
+
       try {
-        await ref.read(swingDaoProvider).insertSwing(
-          SwingsCompanion.insert(
-            sessionId: state!.sessionId,
-            timestamp: event.timestamp.millisecondsSinceEpoch,
-            peakSpeedMph: event.peakSpeedMph,
-            durationMs: event.durationMs,
-          ),
-        );
+        await ref.read(swingDaoProvider).insertSwing(companion);
       } catch (e) {
         // Retry once
         try {
-          await ref.read(swingDaoProvider).insertSwing(
-            SwingsCompanion.insert(
-              sessionId: state!.sessionId,
-              timestamp: event.timestamp.millisecondsSinceEpoch,
-              peakSpeedMph: event.peakSpeedMph,
-              durationMs: event.durationMs,
-            ),
-          );
+          await ref.read(swingDaoProvider).insertSwing(companion);
         } catch (_) {
           // Queue for later batch insert during commit
           state = state!.copyWith(
-            pendingSwings: [
-              ...state!.pendingSwings,
-              SwingsCompanion.insert(
-                sessionId: state!.sessionId,
-                timestamp: event.timestamp.millisecondsSinceEpoch,
-                peakSpeedMph: event.peakSpeedMph,
-                durationMs: event.durationMs,
-              ),
-            ],
+            pendingSwings: [...state!.pendingSwings, companion],
           );
         }
       }

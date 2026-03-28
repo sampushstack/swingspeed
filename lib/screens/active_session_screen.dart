@@ -196,6 +196,8 @@ class _ActiveSessionScreenState extends ConsumerState<ActiveSessionScreen> {
                 peakSpeedMph: session.swings.last.peakSpeedMph,
                 durationMs: session.swings.last.durationMs,
                 delta: session.deltaForSwing(session.swings.length - 1),
+                attackAngleDeg: session.swings.last.attackAngleDeg,
+                swingPathDeg: session.swings.last.swingPathDeg,
               ),
           ],
         ),

@@ -5,24 +5,57 @@ class SwingResultCard extends StatelessWidget {
   final double peakSpeedMph;
   final int durationMs;
   final double? delta;
+  final double? attackAngleDeg;
+  final double? swingPathDeg;
 
-  const SwingResultCard({super.key, required this.peakSpeedMph, required this.durationMs, this.delta});
+  const SwingResultCard({
+    super.key,
+    required this.peakSpeedMph,
+    required this.durationMs,
+    this.delta,
+    this.attackAngleDeg,
+    this.swingPathDeg,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(color: AugustaTheme.surface, border: Border(top: BorderSide(color: AugustaTheme.gold, width: 2))),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-        _StatColumn(label: 'PEAK', value: peakSpeedMph.toStringAsFixed(1), unit: 'mph'),
-        _StatColumn(label: 'DURATION', value: (durationMs / 1000).toStringAsFixed(2), unit: 's'),
-        _StatColumn(
-          label: 'DELTA',
-          value: delta != null ? '${delta! >= 0 ? '+' : ''}${delta!.toStringAsFixed(1)}' : '—',
-          unit: delta != null ? 'mph' : '',
-          valueColor: delta != null ? (delta! >= 0 ? Colors.green.shade300 : Colors.red.shade300) : null,
-        ),
-      ]),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            _StatColumn(label: 'PEAK', value: peakSpeedMph.toStringAsFixed(1), unit: 'mph'),
+            _StatColumn(label: 'DURATION', value: (durationMs / 1000).toStringAsFixed(2), unit: 's'),
+            _StatColumn(
+              label: 'DELTA',
+              value: delta != null ? '${delta! >= 0 ? '+' : ''}${delta!.toStringAsFixed(1)}' : '—',
+              unit: delta != null ? 'mph' : '',
+              valueColor: delta != null ? (delta! >= 0 ? Colors.green.shade300 : Colors.red.shade300) : null,
+            ),
+          ]),
+          if (attackAngleDeg != null || swingPathDeg != null) ...[
+            const SizedBox(height: 12),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+              if (attackAngleDeg != null)
+                _StatColumn(
+                  label: 'ATTACK',
+                  value: '${attackAngleDeg! >= 0 ? '+' : ''}${attackAngleDeg!.toStringAsFixed(1)}\u00B0',
+                  unit: attackAngleDeg! >= 0 ? 'up' : 'down',
+                  valueColor: attackAngleDeg! >= 0 ? Colors.orange.shade300 : Colors.blue.shade300,
+                ),
+              if (swingPathDeg != null)
+                _StatColumn(
+                  label: 'PATH',
+                  value: '${swingPathDeg! >= 0 ? '+' : ''}${swingPathDeg!.toStringAsFixed(1)}\u00B0',
+                  unit: swingPathDeg! >= 0 ? 'in-to-out' : 'out-to-in',
+                  valueColor: null,
+                ),
+            ]),
+          ],
+        ],
+      ),
     );
   }
 }

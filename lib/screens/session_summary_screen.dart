@@ -164,23 +164,59 @@ class _SessionSummaryScreenState extends ConsumerState<SessionSummaryScreen> {
                             color: AugustaTheme.gold.withValues(alpha: 0.3),
                             width: 2)),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text('#${i + 1}',
-                          style: TextStyle(
-                              color: AugustaTheme.textSecondary,
-                              fontFamily: 'Inter')),
-                      Text(
-                          '${swing.peakSpeedMph.toStringAsFixed(1)} mph',
-                          style: TextStyle(
-                              color: AugustaTheme.textPrimary,
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.bold)),
-                      Text('${(swing.durationMs / 1000).toStringAsFixed(2)}s',
-                          style: TextStyle(
-                              color: AugustaTheme.textSecondary,
-                              fontFamily: 'Inter')),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('#${i + 1}',
+                              style: TextStyle(
+                                  color: AugustaTheme.textSecondary,
+                                  fontFamily: 'Inter')),
+                          Text(
+                              '${swing.peakSpeedMph.toStringAsFixed(1)} mph',
+                              style: TextStyle(
+                                  color: AugustaTheme.textPrimary,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold)),
+                          Text('${(swing.durationMs / 1000).toStringAsFixed(2)}s',
+                              style: TextStyle(
+                                  color: AugustaTheme.textSecondary,
+                                  fontFamily: 'Inter')),
+                        ],
+                      ),
+                      if (swing.attackAngleDeg != null || swing.swingPathDeg != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              if (swing.attackAngleDeg != null)
+                                Text(
+                                  'ATK: ${swing.attackAngleDeg! >= 0 ? '+' : ''}${swing.attackAngleDeg!.toStringAsFixed(1)}\u00B0',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 11,
+                                    color: swing.attackAngleDeg! >= 0
+                                        ? Colors.orange.shade300
+                                        : Colors.blue.shade300,
+                                  ),
+                                ),
+                              if (swing.attackAngleDeg != null && swing.swingPathDeg != null)
+                                const SizedBox(width: 12),
+                              if (swing.swingPathDeg != null)
+                                Text(
+                                  'PATH: ${swing.swingPathDeg! >= 0 ? '+' : ''}${swing.swingPathDeg!.toStringAsFixed(1)}\u00B0',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 11,
+                                    color: AugustaTheme.textSecondary,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 );

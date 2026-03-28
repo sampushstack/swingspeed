@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import '../models/swing_event.dart';
 import 'speed_calculator.dart';
 
@@ -19,6 +20,9 @@ class SwingDetector {
 
   _GateState _state = _GateState.idle;
   double _peakOmega = 0.0;
+  double _peakGyroX = 0.0;
+  double _peakGyroY = 0.0;
+  double _peakGyroZ = 0.0;
   DateTime _gateOpenTime = DateTime.now();
   Timer? _cooldownTimer;
   final List<double> _smoothingBuffer = [];
@@ -54,9 +58,17 @@ class SwingDetector {
           _state = _GateState.open;
           _gateOpenTime = DateTime.now();
           _peakOmega = omega;
+          _peakGyroX = x;
+          _peakGyroY = y;
+          _peakGyroZ = z;
         }
       case _GateState.open:
-        if (omega > _peakOmega) _peakOmega = omega;
+        if (omega > _peakOmega) {
+          _peakOmega = omega;
+          _peakGyroX = x;
+          _peakGyroY = y;
+          _peakGyroZ = z;
+        }
         if (omega < endThreshold) {
           final duration =
               DateTime.now().difference(_gateOpenTime).inMilliseconds;
@@ -65,11 +77,25 @@ class SwingDetector {
             clubLengthOffsetM: clubLengthOffsetM,
           );
 
+          // Compute attack angle and swing path from peak-moment axis values
+          // With phone screen = club face:
+          // X-axis rotation = pitch (vertical arc) -> attack angle
+          // Y-axis rotation = yaw (horizontal deviation) -> swing path
+          final attackAngleDeg = math.atan2(
+                _peakGyroX,
+                math.sqrt(_peakGyroY * _peakGyroY + _peakGyroZ * _peakGyroZ),
+              ) *
+              (180.0 / math.pi);
+          final swingPathDeg =
+              math.atan2(_peakGyroY, _peakGyroZ) * (180.0 / math.pi);
+
           if (!_swingEventController.isClosed) {
             _swingEventController.add(SwingEvent(
               peakSpeedMph: speedMph,
               durationMs: duration,
               timestamp: _gateOpenTime,
+              attackAngleDeg: attackAngleDeg,
+              swingPathDeg: swingPathDeg,
             ));
           }
 

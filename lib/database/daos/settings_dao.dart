@@ -38,6 +38,11 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
         .write(SettingsCompanion(allTimePeakMph: Value(peakMph)));
   }
 
+  Future<void> updateLagFactor(double lagFactor) async {
+    await (update(settings)..where((s) => s.id.equals(1)))
+        .write(SettingsCompanion(lagFactor: Value(lagFactor)));
+  }
+
   Future<void> updateThresholds({
     double? startThreshold,
     double? endThreshold,

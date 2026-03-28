@@ -583,6 +583,28 @@ class $SwingsTable extends Swings with TableInfo<$SwingsTable, Swing> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _attackAngleDegMeta = const VerificationMeta(
+    'attackAngleDeg',
+  );
+  @override
+  late final GeneratedColumn<double> attackAngleDeg = GeneratedColumn<double>(
+    'attack_angle_deg',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _swingPathDegMeta = const VerificationMeta(
+    'swingPathDeg',
+  );
+  @override
+  late final GeneratedColumn<double> swingPathDeg = GeneratedColumn<double>(
+    'swing_path_deg',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -590,6 +612,8 @@ class $SwingsTable extends Swings with TableInfo<$SwingsTable, Swing> {
     timestamp,
     peakSpeedMph,
     durationMs,
+    attackAngleDeg,
+    swingPathDeg,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -641,6 +665,24 @@ class $SwingsTable extends Swings with TableInfo<$SwingsTable, Swing> {
     } else if (isInserting) {
       context.missing(_durationMsMeta);
     }
+    if (data.containsKey('attack_angle_deg')) {
+      context.handle(
+        _attackAngleDegMeta,
+        attackAngleDeg.isAcceptableOrUnknown(
+          data['attack_angle_deg']!,
+          _attackAngleDegMeta,
+        ),
+      );
+    }
+    if (data.containsKey('swing_path_deg')) {
+      context.handle(
+        _swingPathDegMeta,
+        swingPathDeg.isAcceptableOrUnknown(
+          data['swing_path_deg']!,
+          _swingPathDegMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -670,6 +712,14 @@ class $SwingsTable extends Swings with TableInfo<$SwingsTable, Swing> {
         DriftSqlType.int,
         data['${effectivePrefix}duration_ms'],
       )!,
+      attackAngleDeg: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}attack_angle_deg'],
+      ),
+      swingPathDeg: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}swing_path_deg'],
+      ),
     );
   }
 
@@ -685,12 +735,16 @@ class Swing extends DataClass implements Insertable<Swing> {
   final int timestamp;
   final double peakSpeedMph;
   final int durationMs;
+  final double? attackAngleDeg;
+  final double? swingPathDeg;
   const Swing({
     required this.id,
     required this.sessionId,
     required this.timestamp,
     required this.peakSpeedMph,
     required this.durationMs,
+    this.attackAngleDeg,
+    this.swingPathDeg,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -700,6 +754,12 @@ class Swing extends DataClass implements Insertable<Swing> {
     map['timestamp'] = Variable<int>(timestamp);
     map['peak_speed_mph'] = Variable<double>(peakSpeedMph);
     map['duration_ms'] = Variable<int>(durationMs);
+    if (!nullToAbsent || attackAngleDeg != null) {
+      map['attack_angle_deg'] = Variable<double>(attackAngleDeg);
+    }
+    if (!nullToAbsent || swingPathDeg != null) {
+      map['swing_path_deg'] = Variable<double>(swingPathDeg);
+    }
     return map;
   }
 
@@ -710,6 +770,12 @@ class Swing extends DataClass implements Insertable<Swing> {
       timestamp: Value(timestamp),
       peakSpeedMph: Value(peakSpeedMph),
       durationMs: Value(durationMs),
+      attackAngleDeg: attackAngleDeg == null && nullToAbsent
+          ? const Value.absent()
+          : Value(attackAngleDeg),
+      swingPathDeg: swingPathDeg == null && nullToAbsent
+          ? const Value.absent()
+          : Value(swingPathDeg),
     );
   }
 
@@ -724,6 +790,8 @@ class Swing extends DataClass implements Insertable<Swing> {
       timestamp: serializer.fromJson<int>(json['timestamp']),
       peakSpeedMph: serializer.fromJson<double>(json['peakSpeedMph']),
       durationMs: serializer.fromJson<int>(json['durationMs']),
+      attackAngleDeg: serializer.fromJson<double?>(json['attackAngleDeg']),
+      swingPathDeg: serializer.fromJson<double?>(json['swingPathDeg']),
     );
   }
   @override
@@ -735,6 +803,8 @@ class Swing extends DataClass implements Insertable<Swing> {
       'timestamp': serializer.toJson<int>(timestamp),
       'peakSpeedMph': serializer.toJson<double>(peakSpeedMph),
       'durationMs': serializer.toJson<int>(durationMs),
+      'attackAngleDeg': serializer.toJson<double?>(attackAngleDeg),
+      'swingPathDeg': serializer.toJson<double?>(swingPathDeg),
     };
   }
 
@@ -744,12 +814,18 @@ class Swing extends DataClass implements Insertable<Swing> {
     int? timestamp,
     double? peakSpeedMph,
     int? durationMs,
+    Value<double?> attackAngleDeg = const Value.absent(),
+    Value<double?> swingPathDeg = const Value.absent(),
   }) => Swing(
     id: id ?? this.id,
     sessionId: sessionId ?? this.sessionId,
     timestamp: timestamp ?? this.timestamp,
     peakSpeedMph: peakSpeedMph ?? this.peakSpeedMph,
     durationMs: durationMs ?? this.durationMs,
+    attackAngleDeg: attackAngleDeg.present
+        ? attackAngleDeg.value
+        : this.attackAngleDeg,
+    swingPathDeg: swingPathDeg.present ? swingPathDeg.value : this.swingPathDeg,
   );
   Swing copyWithCompanion(SwingsCompanion data) {
     return Swing(
@@ -762,6 +838,12 @@ class Swing extends DataClass implements Insertable<Swing> {
       durationMs: data.durationMs.present
           ? data.durationMs.value
           : this.durationMs,
+      attackAngleDeg: data.attackAngleDeg.present
+          ? data.attackAngleDeg.value
+          : this.attackAngleDeg,
+      swingPathDeg: data.swingPathDeg.present
+          ? data.swingPathDeg.value
+          : this.swingPathDeg,
     );
   }
 
@@ -772,14 +854,23 @@ class Swing extends DataClass implements Insertable<Swing> {
           ..write('sessionId: $sessionId, ')
           ..write('timestamp: $timestamp, ')
           ..write('peakSpeedMph: $peakSpeedMph, ')
-          ..write('durationMs: $durationMs')
+          ..write('durationMs: $durationMs, ')
+          ..write('attackAngleDeg: $attackAngleDeg, ')
+          ..write('swingPathDeg: $swingPathDeg')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, sessionId, timestamp, peakSpeedMph, durationMs);
+  int get hashCode => Object.hash(
+    id,
+    sessionId,
+    timestamp,
+    peakSpeedMph,
+    durationMs,
+    attackAngleDeg,
+    swingPathDeg,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -788,7 +879,9 @@ class Swing extends DataClass implements Insertable<Swing> {
           other.sessionId == this.sessionId &&
           other.timestamp == this.timestamp &&
           other.peakSpeedMph == this.peakSpeedMph &&
-          other.durationMs == this.durationMs);
+          other.durationMs == this.durationMs &&
+          other.attackAngleDeg == this.attackAngleDeg &&
+          other.swingPathDeg == this.swingPathDeg);
 }
 
 class SwingsCompanion extends UpdateCompanion<Swing> {
@@ -797,12 +890,16 @@ class SwingsCompanion extends UpdateCompanion<Swing> {
   final Value<int> timestamp;
   final Value<double> peakSpeedMph;
   final Value<int> durationMs;
+  final Value<double?> attackAngleDeg;
+  final Value<double?> swingPathDeg;
   const SwingsCompanion({
     this.id = const Value.absent(),
     this.sessionId = const Value.absent(),
     this.timestamp = const Value.absent(),
     this.peakSpeedMph = const Value.absent(),
     this.durationMs = const Value.absent(),
+    this.attackAngleDeg = const Value.absent(),
+    this.swingPathDeg = const Value.absent(),
   });
   SwingsCompanion.insert({
     this.id = const Value.absent(),
@@ -810,6 +907,8 @@ class SwingsCompanion extends UpdateCompanion<Swing> {
     required int timestamp,
     required double peakSpeedMph,
     required int durationMs,
+    this.attackAngleDeg = const Value.absent(),
+    this.swingPathDeg = const Value.absent(),
   }) : sessionId = Value(sessionId),
        timestamp = Value(timestamp),
        peakSpeedMph = Value(peakSpeedMph),
@@ -820,6 +919,8 @@ class SwingsCompanion extends UpdateCompanion<Swing> {
     Expression<int>? timestamp,
     Expression<double>? peakSpeedMph,
     Expression<int>? durationMs,
+    Expression<double>? attackAngleDeg,
+    Expression<double>? swingPathDeg,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -827,6 +928,8 @@ class SwingsCompanion extends UpdateCompanion<Swing> {
       if (timestamp != null) 'timestamp': timestamp,
       if (peakSpeedMph != null) 'peak_speed_mph': peakSpeedMph,
       if (durationMs != null) 'duration_ms': durationMs,
+      if (attackAngleDeg != null) 'attack_angle_deg': attackAngleDeg,
+      if (swingPathDeg != null) 'swing_path_deg': swingPathDeg,
     });
   }
 
@@ -836,6 +939,8 @@ class SwingsCompanion extends UpdateCompanion<Swing> {
     Value<int>? timestamp,
     Value<double>? peakSpeedMph,
     Value<int>? durationMs,
+    Value<double?>? attackAngleDeg,
+    Value<double?>? swingPathDeg,
   }) {
     return SwingsCompanion(
       id: id ?? this.id,
@@ -843,6 +948,8 @@ class SwingsCompanion extends UpdateCompanion<Swing> {
       timestamp: timestamp ?? this.timestamp,
       peakSpeedMph: peakSpeedMph ?? this.peakSpeedMph,
       durationMs: durationMs ?? this.durationMs,
+      attackAngleDeg: attackAngleDeg ?? this.attackAngleDeg,
+      swingPathDeg: swingPathDeg ?? this.swingPathDeg,
     );
   }
 
@@ -864,6 +971,12 @@ class SwingsCompanion extends UpdateCompanion<Swing> {
     if (durationMs.present) {
       map['duration_ms'] = Variable<int>(durationMs.value);
     }
+    if (attackAngleDeg.present) {
+      map['attack_angle_deg'] = Variable<double>(attackAngleDeg.value);
+    }
+    if (swingPathDeg.present) {
+      map['swing_path_deg'] = Variable<double>(swingPathDeg.value);
+    }
     return map;
   }
 
@@ -874,7 +987,9 @@ class SwingsCompanion extends UpdateCompanion<Swing> {
           ..write('sessionId: $sessionId, ')
           ..write('timestamp: $timestamp, ')
           ..write('peakSpeedMph: $peakSpeedMph, ')
-          ..write('durationMs: $durationMs')
+          ..write('durationMs: $durationMs, ')
+          ..write('attackAngleDeg: $attackAngleDeg, ')
+          ..write('swingPathDeg: $swingPathDeg')
           ..write(')'))
         .toString();
   }
@@ -981,6 +1096,18 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     requiredDuringInsert: false,
     defaultValue: const Constant(1500),
   );
+  static const VerificationMeta _lagFactorMeta = const VerificationMeta(
+    'lagFactor',
+  );
+  @override
+  late final GeneratedColumn<double> lagFactor = GeneratedColumn<double>(
+    'lag_factor',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1.2),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -991,6 +1118,7 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     swingStartThreshold,
     swingEndThreshold,
     cooldownMs,
+    lagFactor,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1064,6 +1192,12 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         cooldownMs.isAcceptableOrUnknown(data['cooldown_ms']!, _cooldownMsMeta),
       );
     }
+    if (data.containsKey('lag_factor')) {
+      context.handle(
+        _lagFactorMeta,
+        lagFactor.isAcceptableOrUnknown(data['lag_factor']!, _lagFactorMeta),
+      );
+    }
     return context;
   }
 
@@ -1105,6 +1239,10 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         DriftSqlType.int,
         data['${effectivePrefix}cooldown_ms'],
       )!,
+      lagFactor: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}lag_factor'],
+      )!,
     );
   }
 
@@ -1123,6 +1261,7 @@ class Setting extends DataClass implements Insertable<Setting> {
   final double swingStartThreshold;
   final double swingEndThreshold;
   final int cooldownMs;
+  final double lagFactor;
   const Setting({
     required this.id,
     required this.swingMode,
@@ -1132,6 +1271,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     required this.swingStartThreshold,
     required this.swingEndThreshold,
     required this.cooldownMs,
+    required this.lagFactor,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1144,6 +1284,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     map['swing_start_threshold'] = Variable<double>(swingStartThreshold);
     map['swing_end_threshold'] = Variable<double>(swingEndThreshold);
     map['cooldown_ms'] = Variable<int>(cooldownMs);
+    map['lag_factor'] = Variable<double>(lagFactor);
     return map;
   }
 
@@ -1157,6 +1298,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       swingStartThreshold: Value(swingStartThreshold),
       swingEndThreshold: Value(swingEndThreshold),
       cooldownMs: Value(cooldownMs),
+      lagFactor: Value(lagFactor),
     );
   }
 
@@ -1176,6 +1318,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       ),
       swingEndThreshold: serializer.fromJson<double>(json['swingEndThreshold']),
       cooldownMs: serializer.fromJson<int>(json['cooldownMs']),
+      lagFactor: serializer.fromJson<double>(json['lagFactor']),
     );
   }
   @override
@@ -1190,6 +1333,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       'swingStartThreshold': serializer.toJson<double>(swingStartThreshold),
       'swingEndThreshold': serializer.toJson<double>(swingEndThreshold),
       'cooldownMs': serializer.toJson<int>(cooldownMs),
+      'lagFactor': serializer.toJson<double>(lagFactor),
     };
   }
 
@@ -1202,6 +1346,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     double? swingStartThreshold,
     double? swingEndThreshold,
     int? cooldownMs,
+    double? lagFactor,
   }) => Setting(
     id: id ?? this.id,
     swingMode: swingMode ?? this.swingMode,
@@ -1211,6 +1356,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     swingStartThreshold: swingStartThreshold ?? this.swingStartThreshold,
     swingEndThreshold: swingEndThreshold ?? this.swingEndThreshold,
     cooldownMs: cooldownMs ?? this.cooldownMs,
+    lagFactor: lagFactor ?? this.lagFactor,
   );
   Setting copyWithCompanion(SettingsCompanion data) {
     return Setting(
@@ -1234,6 +1380,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       cooldownMs: data.cooldownMs.present
           ? data.cooldownMs.value
           : this.cooldownMs,
+      lagFactor: data.lagFactor.present ? data.lagFactor.value : this.lagFactor,
     );
   }
 
@@ -1247,7 +1394,8 @@ class Setting extends DataClass implements Insertable<Setting> {
           ..write('allTimePeakMph: $allTimePeakMph, ')
           ..write('swingStartThreshold: $swingStartThreshold, ')
           ..write('swingEndThreshold: $swingEndThreshold, ')
-          ..write('cooldownMs: $cooldownMs')
+          ..write('cooldownMs: $cooldownMs, ')
+          ..write('lagFactor: $lagFactor')
           ..write(')'))
         .toString();
   }
@@ -1262,6 +1410,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     swingStartThreshold,
     swingEndThreshold,
     cooldownMs,
+    lagFactor,
   );
   @override
   bool operator ==(Object other) =>
@@ -1274,7 +1423,8 @@ class Setting extends DataClass implements Insertable<Setting> {
           other.allTimePeakMph == this.allTimePeakMph &&
           other.swingStartThreshold == this.swingStartThreshold &&
           other.swingEndThreshold == this.swingEndThreshold &&
-          other.cooldownMs == this.cooldownMs);
+          other.cooldownMs == this.cooldownMs &&
+          other.lagFactor == this.lagFactor);
 }
 
 class SettingsCompanion extends UpdateCompanion<Setting> {
@@ -1286,6 +1436,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   final Value<double> swingStartThreshold;
   final Value<double> swingEndThreshold;
   final Value<int> cooldownMs;
+  final Value<double> lagFactor;
   const SettingsCompanion({
     this.id = const Value.absent(),
     this.swingMode = const Value.absent(),
@@ -1295,6 +1446,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     this.swingStartThreshold = const Value.absent(),
     this.swingEndThreshold = const Value.absent(),
     this.cooldownMs = const Value.absent(),
+    this.lagFactor = const Value.absent(),
   });
   SettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -1305,6 +1457,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     this.swingStartThreshold = const Value.absent(),
     this.swingEndThreshold = const Value.absent(),
     this.cooldownMs = const Value.absent(),
+    this.lagFactor = const Value.absent(),
   });
   static Insertable<Setting> custom({
     Expression<int>? id,
@@ -1315,6 +1468,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Expression<double>? swingStartThreshold,
     Expression<double>? swingEndThreshold,
     Expression<int>? cooldownMs,
+    Expression<double>? lagFactor,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1326,6 +1480,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
         'swing_start_threshold': swingStartThreshold,
       if (swingEndThreshold != null) 'swing_end_threshold': swingEndThreshold,
       if (cooldownMs != null) 'cooldown_ms': cooldownMs,
+      if (lagFactor != null) 'lag_factor': lagFactor,
     });
   }
 
@@ -1338,6 +1493,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Value<double>? swingStartThreshold,
     Value<double>? swingEndThreshold,
     Value<int>? cooldownMs,
+    Value<double>? lagFactor,
   }) {
     return SettingsCompanion(
       id: id ?? this.id,
@@ -1348,6 +1504,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
       swingStartThreshold: swingStartThreshold ?? this.swingStartThreshold,
       swingEndThreshold: swingEndThreshold ?? this.swingEndThreshold,
       cooldownMs: cooldownMs ?? this.cooldownMs,
+      lagFactor: lagFactor ?? this.lagFactor,
     );
   }
 
@@ -1380,6 +1537,9 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     if (cooldownMs.present) {
       map['cooldown_ms'] = Variable<int>(cooldownMs.value);
     }
+    if (lagFactor.present) {
+      map['lag_factor'] = Variable<double>(lagFactor.value);
+    }
     return map;
   }
 
@@ -1393,7 +1553,8 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
           ..write('allTimePeakMph: $allTimePeakMph, ')
           ..write('swingStartThreshold: $swingStartThreshold, ')
           ..write('swingEndThreshold: $swingEndThreshold, ')
-          ..write('cooldownMs: $cooldownMs')
+          ..write('cooldownMs: $cooldownMs, ')
+          ..write('lagFactor: $lagFactor')
           ..write(')'))
         .toString();
   }
@@ -1788,6 +1949,8 @@ typedef $$SwingsTableCreateCompanionBuilder =
       required int timestamp,
       required double peakSpeedMph,
       required int durationMs,
+      Value<double?> attackAngleDeg,
+      Value<double?> swingPathDeg,
     });
 typedef $$SwingsTableUpdateCompanionBuilder =
     SwingsCompanion Function({
@@ -1796,6 +1959,8 @@ typedef $$SwingsTableUpdateCompanionBuilder =
       Value<int> timestamp,
       Value<double> peakSpeedMph,
       Value<int> durationMs,
+      Value<double?> attackAngleDeg,
+      Value<double?> swingPathDeg,
     });
 
 final class $$SwingsTableReferences
@@ -1846,6 +2011,16 @@ class $$SwingsTableFilterComposer
 
   ColumnFilters<int> get durationMs => $composableBuilder(
     column: $table.durationMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get attackAngleDeg => $composableBuilder(
+    column: $table.attackAngleDeg,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get swingPathDeg => $composableBuilder(
+    column: $table.swingPathDeg,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1902,6 +2077,16 @@ class $$SwingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get attackAngleDeg => $composableBuilder(
+    column: $table.attackAngleDeg,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get swingPathDeg => $composableBuilder(
+    column: $table.swingPathDeg,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$SessionsTableOrderingComposer get sessionId {
     final $$SessionsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -1948,6 +2133,16 @@ class $$SwingsTableAnnotationComposer
 
   GeneratedColumn<int> get durationMs => $composableBuilder(
     column: $table.durationMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get attackAngleDeg => $composableBuilder(
+    column: $table.attackAngleDeg,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get swingPathDeg => $composableBuilder(
+    column: $table.swingPathDeg,
     builder: (column) => column,
   );
 
@@ -2008,12 +2203,16 @@ class $$SwingsTableTableManager
                 Value<int> timestamp = const Value.absent(),
                 Value<double> peakSpeedMph = const Value.absent(),
                 Value<int> durationMs = const Value.absent(),
+                Value<double?> attackAngleDeg = const Value.absent(),
+                Value<double?> swingPathDeg = const Value.absent(),
               }) => SwingsCompanion(
                 id: id,
                 sessionId: sessionId,
                 timestamp: timestamp,
                 peakSpeedMph: peakSpeedMph,
                 durationMs: durationMs,
+                attackAngleDeg: attackAngleDeg,
+                swingPathDeg: swingPathDeg,
               ),
           createCompanionCallback:
               ({
@@ -2022,12 +2221,16 @@ class $$SwingsTableTableManager
                 required int timestamp,
                 required double peakSpeedMph,
                 required int durationMs,
+                Value<double?> attackAngleDeg = const Value.absent(),
+                Value<double?> swingPathDeg = const Value.absent(),
               }) => SwingsCompanion.insert(
                 id: id,
                 sessionId: sessionId,
                 timestamp: timestamp,
                 peakSpeedMph: peakSpeedMph,
                 durationMs: durationMs,
+                attackAngleDeg: attackAngleDeg,
+                swingPathDeg: swingPathDeg,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -2104,6 +2307,7 @@ typedef $$SettingsTableCreateCompanionBuilder =
       Value<double> swingStartThreshold,
       Value<double> swingEndThreshold,
       Value<int> cooldownMs,
+      Value<double> lagFactor,
     });
 typedef $$SettingsTableUpdateCompanionBuilder =
     SettingsCompanion Function({
@@ -2115,6 +2319,7 @@ typedef $$SettingsTableUpdateCompanionBuilder =
       Value<double> swingStartThreshold,
       Value<double> swingEndThreshold,
       Value<int> cooldownMs,
+      Value<double> lagFactor,
     });
 
 class $$SettingsTableFilterComposer
@@ -2163,6 +2368,11 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<int> get cooldownMs => $composableBuilder(
     column: $table.cooldownMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get lagFactor => $composableBuilder(
+    column: $table.lagFactor,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2215,6 +2425,11 @@ class $$SettingsTableOrderingComposer
     column: $table.cooldownMs,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<double> get lagFactor => $composableBuilder(
+    column: $table.lagFactor,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableAnnotationComposer
@@ -2261,6 +2476,9 @@ class $$SettingsTableAnnotationComposer
     column: $table.cooldownMs,
     builder: (column) => column,
   );
+
+  GeneratedColumn<double> get lagFactor =>
+      $composableBuilder(column: $table.lagFactor, builder: (column) => column);
 }
 
 class $$SettingsTableTableManager
@@ -2299,6 +2517,7 @@ class $$SettingsTableTableManager
                 Value<double> swingStartThreshold = const Value.absent(),
                 Value<double> swingEndThreshold = const Value.absent(),
                 Value<int> cooldownMs = const Value.absent(),
+                Value<double> lagFactor = const Value.absent(),
               }) => SettingsCompanion(
                 id: id,
                 swingMode: swingMode,
@@ -2308,6 +2527,7 @@ class $$SettingsTableTableManager
                 swingStartThreshold: swingStartThreshold,
                 swingEndThreshold: swingEndThreshold,
                 cooldownMs: cooldownMs,
+                lagFactor: lagFactor,
               ),
           createCompanionCallback:
               ({
@@ -2319,6 +2539,7 @@ class $$SettingsTableTableManager
                 Value<double> swingStartThreshold = const Value.absent(),
                 Value<double> swingEndThreshold = const Value.absent(),
                 Value<int> cooldownMs = const Value.absent(),
+                Value<double> lagFactor = const Value.absent(),
               }) => SettingsCompanion.insert(
                 id: id,
                 swingMode: swingMode,
@@ -2328,6 +2549,7 @@ class $$SettingsTableTableManager
                 swingStartThreshold: swingStartThreshold,
                 swingEndThreshold: swingEndThreshold,
                 cooldownMs: cooldownMs,
+                lagFactor: lagFactor,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

@@ -20,6 +20,8 @@ class Swings extends Table {
   IntColumn get timestamp => integer()();
   RealColumn get peakSpeedMph => real()();
   IntColumn get durationMs => integer()();
+  RealColumn get attackAngleDeg => real().nullable()();
+  RealColumn get swingPathDeg => real().nullable()();
 }
 
 class Settings extends Table {
@@ -33,6 +35,7 @@ class Settings extends Table {
   RealColumn get swingStartThreshold => real().withDefault(const Constant(3.0))();
   RealColumn get swingEndThreshold => real().withDefault(const Constant(1.0))();
   IntColumn get cooldownMs => integer().withDefault(const Constant(1500))();
+  RealColumn get lagFactor => real().withDefault(const Constant(1.2))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -44,7 +47,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? driftDatabase(name: 'swingspeed'));
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -58,6 +61,11 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 3) {
             await m.addColumn(settings, settings.selectedClubType);
+          }
+          if (from < 4) {
+            await m.addColumn(settings, settings.lagFactor);
+            await m.addColumn(swings, swings.attackAngleDeg);
+            await m.addColumn(swings, swings.swingPathDeg);
           }
         },
         beforeOpen: (details) async {
