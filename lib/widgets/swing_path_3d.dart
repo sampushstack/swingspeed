@@ -69,7 +69,8 @@ class _SwingPath3DState extends State<SwingPath3D> {
     final points = <vm.Vector3>[];
     final omegas = <double>[];
     double peak = 0.0;
-    int peakIdx = 0;
+    double lowestY = double.infinity;
+    int impactIdx = 0;
 
     for (var i = 0; i < samples.length; i++) {
       final s = samples[i];
@@ -77,12 +78,17 @@ class _SwingPath3DState extends State<SwingPath3D> {
 
       if (s.omega > peak) {
         peak = s.omega;
-        peakIdx = i;
       }
 
       // Compute club head position at current orientation
       final rotated = orientation.rotated(clubVec);
       points.add(rotated);
+
+      // Impact = lowest point in the arc (minimum Y coordinate)
+      if (rotated.y < lowestY) {
+        lowestY = rotated.y;
+        impactIdx = i;
+      }
 
       // Integrate angular velocity to update orientation
       if (s.omega > 1e-6) {
@@ -96,7 +102,7 @@ class _SwingPath3DState extends State<SwingPath3D> {
 
     _pathPoints = points;
     _pathOmegas = omegas;
-    _impactIndex = peakIdx;
+    _impactIndex = impactIdx;
     _maxOmega = peak > 0 ? peak : 1.0;
     _minOmega = omegas.isEmpty ? 0.0 : omegas.reduce(math.min);
   }
