@@ -150,8 +150,10 @@ class _SwingPath3DPainter extends CustomPainter {
   final double rotationY;
   final double? peakSpeedMph;
 
-  static const _gold = Color(0xFFC9A84C);
-  static const _cream = Color(0xFFF5F0E8);
+  // Speed gradient: yellow (slow) → orange (medium) → red (fastest)
+  static const _slowColor = Color(0xFFFFD54F);   // yellow
+  static const _midColor = Color(0xFFFF8C00);     // orange
+  static const _fastColor = Color(0xFFE53935);    // red
 
   _SwingPath3DPainter({
     required this.pathPoints,
@@ -211,7 +213,10 @@ class _SwingPath3DPainter extends CustomPainter {
       final p1 = _project(pathPoints[i + 1], view, cx, cy, focalLength);
 
       final t = omegaRange > 0 ? (pathOmegas[i] - minOmega) / omegaRange : 0.0;
-      final color = Color.lerp(_gold, _cream, t)!;
+      // Two-stop gradient: yellow (0.0) → orange (0.5) → red (1.0)
+      final color = t < 0.5
+          ? Color.lerp(_slowColor, _midColor, t * 2)!
+          : Color.lerp(_midColor, _fastColor, (t - 0.5) * 2)!;
       final strokeWidth = 1.5 + t * 3.5; // thicker = faster
 
       canvas.drawLine(
@@ -231,16 +236,16 @@ class _SwingPath3DPainter extends CustomPainter {
       // Outer glow
       canvas.drawCircle(
         impactScreen,
-        8,
+        10,
         Paint()
-          ..color = _cream.withValues(alpha: 0.3)
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+          ..color = _fastColor.withValues(alpha: 0.4)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
       );
       // Inner dot
       canvas.drawCircle(
         impactScreen,
-        4,
-        Paint()..color = _cream,
+        5,
+        Paint()..color = _fastColor,
       );
 
       // Label with peak speed
@@ -252,7 +257,7 @@ class _SwingPath3DPainter extends CustomPainter {
               fontFamily: 'Inter',
               fontSize: 11,
               fontWeight: FontWeight.bold,
-              color: _cream,
+              color: Color(0xFFF5F0E8),
             ),
           ),
           textDirection: TextDirection.ltr,
