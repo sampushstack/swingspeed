@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="375" height="812" viewBox="0 0 375 812">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1A2F1A"/>
+      <stop offset="100%" stop-color="#162816"/>
+    </linearGradient>
+  </defs>
+  <!-- Phone frame -->
+  <rect width="375" height="812" rx="40" fill="url(#bg2)"/>
+  <rect x="1" y="1" width="373" height="810" rx="39" fill="none" stroke="#2D4A2D" stroke-width="1"/>
+
+  <!-- Status bar -->
+  <text x="187" y="52" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#A8C8A8">9:41</text>
+
+  <!-- Header -->
+  <text x="36" y="90" font-family="Inter,sans-serif" font-size="12" font-weight="bold" fill="#C9A84C" letter-spacing="3">ACTIVE SESSION</text>
+  <text x="339" y="90" text-anchor="end" font-family="Inter,sans-serif" font-size="12" fill="#A8C8A8" letter-spacing="2">END SESSION</text>
+
+  <!-- Speed Gauge -->
+  <g transform="translate(187, 320)">
+    <!-- Background arc -->
+    <path d="M -120 30 A 125 125 0 1 1 120 30" fill="none" stroke="#2D4A2D" stroke-width="14" stroke-linecap="round"/>
+    <!-- Value arc (about 60% fill) -->
+    <path d="M -120 30 A 125 125 0 1 1 75 -100" fill="none" stroke="#C9A84C" stroke-width="14" stroke-linecap="round"/>
+    <!-- Needle line -->
+    <line x1="0" y1="0" x2="68" y2="-88" stroke="#F5F0E8" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Center dot -->
+    <circle cx="0" cy="0" r="6" fill="#C9A84C"/>
+    <!-- Speed value -->
+    <text x="0" y="-10" text-anchor="middle" font-family="Georgia,serif" font-size="52" font-weight="bold" fill="#F5F0E8">87.4</text>
+    <text x="0" y="18" text-anchor="middle" font-family="Inter,sans-serif" font-size="14" font-weight="bold" fill="#C9A84C" letter-spacing="4">MPH</text>
+  </g>
+
+  <!-- Mini stats -->
+  <text x="120" y="430" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="bold" fill="#C9A84C" letter-spacing="3">SWINGS</text>
+  <text x="120" y="458" text-anchor="middle" font-family="Inter,sans-serif" font-size="24" font-weight="bold" fill="#F5F0E8">7</text>
+
+  <text x="255" y="430" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="bold" fill="#C9A84C" letter-spacing="3">AVG</text>
+  <text x="255" y="458" text-anchor="middle" font-family="Inter,sans-serif" font-size="24" font-weight="bold" fill="#F5F0E8">82.1</text>
+
+  <!-- Swing Result Card -->
+  <rect x="0" y="580" width="375" height="170" fill="#2D4A2D"/>
+  <line x1="0" y1="580" x2="375" y2="580" stroke="#C9A84C" stroke-width="2"/>
+
+  <!-- Row 1: Peak, Duration, Delta -->
+  <text x="70" y="610" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="bold" fill="#C9A84C" letter-spacing="2">PEAK</text>
+  <text x="70" y="638" text-anchor="middle" font-family="Inter,sans-serif" font-size="22" font-weight="bold" fill="#F5F0E8">87.4</text>
+  <text x="70" y="654" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#A8C8A8">mph</text>
+
+  <text x="187" y="610" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="bold" fill="#C9A84C" letter-spacing="2">DURATION</text>
+  <text x="187" y="638" text-anchor="middle" font-family="Inter,sans-serif" font-size="22" font-weight="bold" fill="#F5F0E8">0.32</text>
+  <text x="187" y="654" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#A8C8A8">s</text>
+
+  <text x="305" y="610" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="bold" fill="#C9A84C" letter-spacing="2">DELTA</text>
+  <text x="305" y="638" text-anchor="middle" font-family="Inter,sans-serif" font-size="22" font-weight="bold" fill="#66BB6A">+5.3</text>
+  <text x="305" y="654" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#A8C8A8">mph</text>
+
+  <!-- Row 2: Attack, Path, Lag -->
+  <text x="70" y="678" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="bold" fill="#C9A84C" letter-spacing="2">ATTACK</text>
+  <text x="70" y="703" text-anchor="middle" font-family="Inter,sans-serif" font-size="18" font-weight="bold" fill="#64B5F6">-3.2°</text>
+  <text x="70" y="718" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#A8C8A8">down</text>
+
+  <text x="187" y="678" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="bold" fill="#C9A84C" letter-spacing="2">PATH</text>
+  <text x="187" y="703" text-anchor="middle" font-family="Inter,sans-serif" font-size="18" font-weight="bold" fill="#F5F0E8">+1.8°</text>
+  <text x="187" y="718" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#A8C8A8">in-to-out</text>
+
+  <text x="305" y="678" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="bold" fill="#C9A84C" letter-spacing="2">LAG</text>
+  <text x="305" y="703" text-anchor="middle" font-family="Inter,sans-serif" font-size="18" font-weight="bold" fill="#66BB6A">1.28x</text>
+  <text x="305" y="718" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#A8C8A8">moderate</text>
+</svg>

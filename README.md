@@ -2,11 +2,23 @@
 
 A mobile app that measures peak golf swing speed using your phone's built-in IMU sensors. Attach the phone to a club shaft or simply hold it in your hand and swing. No external hardware required.
 
+<p align="center">
+  <img src="assets/screenshots/home.svg" width="220" alt="Home Dashboard"/>
+  &nbsp;&nbsp;
+  <img src="assets/screenshots/active-session.svg" width="220" alt="Active Session"/>
+  &nbsp;&nbsp;
+  <img src="assets/screenshots/session-summary.svg" width="220" alt="Session Summary"/>
+</p>
+
 ## Features
 
 ### Two Swing Modes
 
 **Club Mount** — Attach the phone to the mid-shaft of a golf club. The app measures angular velocity at the attachment point and calculates club head speed based on the distance to the club head.
+
+<p align="center">
+  <img src="assets/screenshots/settings.svg" width="260" alt="Settings — Freehand Mode"/>
+</p>
 
 **Freehand** — Hold the phone in your hand (screen facing target, like a club face) and swing without a club. The app estimates club head speed for any selected club type using:
 - Your arm length (configurable)
